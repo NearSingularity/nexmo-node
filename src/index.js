@@ -4,6 +4,7 @@ var querystring = require("querystring");
 
 var msgpath = { host: "rest.nexmo.com", path: "/sms/json" };
 var shortcodePath = { host: "rest.nexmo.com", path: "/sc/us/${type}/json" };
+var optInPath = { host: "rest.nexmo.com", path: "/sc/us/alert/opt-in/manage/json" }
 var ttsEndpoint = { host: "api.nexmo.com", path: "/tts/json" };
 var ttsPromptEndpoint = { host: "api.nexmo.com", path: "/tts-prompt/json" };
 var callEndpoint = { host: "rest.nexmo.com", path: "/call/json" };
@@ -74,6 +75,27 @@ exports.initialize = function(pkey, psecret, options) {
     api_secret: psecret
   };
   _options = options;
+};
+
+exports.subscribeNumber = function(number, callback) {
+  if (!number) {
+    sendError(callback, new Error(ERROR_MESSAGES.requiredArgument('number')))
+  } else {
+    var path = clone(optInPath)
+    path.path += "?" + querystring.stringify({msisdn: number});
+
+    sendRequest(path, "POST", function(err, apiResponse) {
+      if (!err && apiResponse.status && apiResponse.messages[0].status > 0) {
+        sendError(
+          callback,
+          new Error(apiResponse.messages[0]["error-text"]),
+          apiResponse
+        );
+      } else {
+        if (callback) callback(err, apiResponse);
+      }
+    });
+  }
 };
 
 exports.sendBinaryMessage = function(sender, recipient, body, udh, callback) {

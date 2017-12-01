@@ -64,6 +64,15 @@ class Message {
   shortcodeMarketing() {
     this._nexmo.shortcodeMarketing.apply(this._nexmo, arguments);
   }
+
+  /**
+   * TODO: document
+   * TODO: move to Alert.js?
+   */
+  subscribeNumber() {
+    this._nexmo.subscribeNumber.apply(this._nexmo, arguments);
+  }
+
 }
 
 export default Message;
